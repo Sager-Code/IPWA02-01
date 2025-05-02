@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
+             version="3.0">
+    <persistence-unit name="ghostNetPU" transaction-type="JTA">
+        <jta-data-source>java:global/jdbc/GhostNetDS</jta-data-source>
+        <class>org.sheasepherd.entity.GhostNet</class>
+        <class>org.sheasepherd.entity.Reporter</class>
+        <class>org.sheasepherd.entity.Rescuer</class>
+        <properties>
+            <!-- JPA Eigenschaften -->
+            <property name="jakarta.persistence.schema-generation.database.action" value="create"/>
+            <property name="jakarta.persistence.sql-load-script-source" value="META-INF/sql/init-data.sql"/>
+            
+            <!-- Hibernate Eigenschaften -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL8Dialect"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+            
+            <!-- Entwicklungseinstellungen (für Produktion deaktivieren) -->
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+        </properties>
+    </persistence-unit>
+</persistence>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/templates/template.xhtml">
+    <ui:define name="title">Shea Shepherd - Geisternetz bergen</ui:define>
+    
+    <ui:define name="pageTitle">Geisternetz bergen</ui:define>
+    
+    <ui:define name="content">
+        <div class="rescue-container">
+            <!-- Ein einziges Formular für die gesamte Seite -->
+            <h:form id="rescueMainForm">
+                <p:tabView id="rescueTabView">
+                    <!-- Tab 1: Berger-Registrierung -->
+                    <p:tab title="Berger-Registrierung" id="rescuerRegistration">
+                        <p:panel header="Ihre Informationen als bergende Person">
+                            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-grid">
+                                <p:outputLabel for="rescuerName" value="Name:" styleClass="required" />
+                                <p:inputText id="rescuerName" value="#{rescuerController.currentRescuer.name}" 
+                                             required="true" requiredMessage="Bitte geben Sie Ihren Namen ein." />
+                                
+                                <p:outputLabel for="rescuerPhone" value="Telefonnummer:" styleClass="required" />
+                                <p:inputText id="rescuerPhone" value="#{rescuerController.currentRescuer.phoneNumber}" 
+                                             required="true" requiredMessage="Bitte geben Sie Ihre Telefonnummer für Rückfragen ein." />
+                            </p:panelGrid>
+                            
+                            <p:spacer height="15" />
+                            
+                            <div class="button-container">
+                                <p:commandButton value="Registrieren" 
+                                                 action="#{rescuerController.saveRescuer}" 
+                                                 update="@form"
+                                                 styleClass="ui-button-success"
+                                                 icon="pi pi-user-plus" />
+                            </div>
+                        </p:panel>
+                    </p:tab>
+                    
+                    <!-- Tab 2: Verfügbare Geisternetze -->
+                    <p:tab title="Verfügbare Geisternetze" id="availableGhostNets">
+                        <p:panel header="Berger auswählen">
+                            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-grid">
+                                <p:outputLabel for="rescuer" value="Berger:" styleClass="required" />
+                                <p:selectOneMenu id="rescuer" value="#{rescuerController.currentRescuer}" 
+                                                 required="true" requiredMessage="Bitte wählen Sie einen Berger aus."
+                                                 converter="#{rescuerConverter}">
+                                    <f:selectItem itemLabel="Bitte wählen" itemValue="" noSelectionOption="true" />
+                                    <f:selectItems value="#{rescuerController.rescuers}" var="r"
+                                                   itemLabel="#{r.name} (#{r.phoneNumber})" itemValue="#{r}" />
+                                    <p:ajax update="availableGhostNetsTable assignedGhostNetsTable" />
+                                </p:selectOneMenu>
+                            </p:panelGrid>
+                        </p:panel>
+                        
+                        <p:spacer height="20" />
+                        
+                        <p:panel header="Verfügbare Geisternetze">
+                            <p:dataTable id="availableGhostNetsTable" value="#{rescuerController.availableGhostNets}" 
+                                         var="net" emptyMessage="Keine verfügbaren Geisternetze gefunden."
+                                         rowKey="#{net.id}" selection="#{ghostNetController.currentGhostNet}" 
+                                         selectionMode="single">
+                                <p:column headerText="ID">
+                                    <h:outputText value="#{net.id}" />
+                                </p:column>
+                                
+                                <p:column headerText="Position">
+                                    <h:outputText value="#{net.latitude}, #{net.longitude}" />
+                                </p:column>
+                                
+                                <p:column headerText="Geschätzte Größe">
+                                    <h:outputText value="#{net.estimatedSize}" />
+                                </p:column>
+                                
+                                <p:column headerText="Meldedatum">
+                                    <h:outputText value="#{net.reportDate}">
+                                        <f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
+                                    </h:outputText>
+                                </p:column>
+                                
+                                <p:column headerText="Aktionen">
+                                    <p:commandButton value="Zur Bergung übernehmen" 
+                                                     action="#{rescuerController.assignGhostNetToRescuer(net, rescuerController.currentRescuer)}" 
+                                                     update="availableGhostNetsTable assignedGhostNetsTable"
+                                                     styleClass="ui-button-success"
+                                                     disabled="#{rescuerController.currentRescuer.id == null}"
+                                                     icon="pi pi-plus" />
+                                </p:column>
+                            </p:dataTable>
+                        </p:panel>
+                    </p:tab>
+                    
+                    <!-- Tab 3: Meine zugewiesenen Geisternetze -->
+                    <p:tab title="Meine zugewiesenen Geisternetze" id="assignedGhostNets">
+                        <p:panel header="Meine zugewiesenen Geisternetze">
+                            <p:dataTable id="assignedGhostNetsTable" value="#{rescuerController.assignedGhostNets}" 
+                                         var="net" emptyMessage="Keine zugewiesenen Geisternetze gefunden."
+                                         rowKey="#{net.id}">
+                                <p:column headerText="ID">
+                                    <h:outputText value="#{net.id}" />
+                                </p:column>
+                                
+                                <p:column headerText="Position">
+                                    <h:outputText value="#{net.latitude}, #{net.longitude}" />
+                                </p:column>
+                                
+                                <p:column headerText="Geschätzte Größe">
+                                    <h:outputText value="#{net.estimatedSize}" />
+                                </p:column>
+                                
+                                <p:column headerText="Status">
+                                    <p:tag severity="warning" value="#{net.status.displayName}" 
+                                           styleClass="status-#{net.status}" />
+                                </p:column>
+                                
+                                <p:column headerText="Aktionen">
+                                    <p:commandButton value="Als geborgen markieren" 
+                                                     action="#{rescuerController.markGhostNetAsRescued(net)}" 
+                                                     update="assignedGhostNetsTable"
+                                                     styleClass="ui-button-success"
+                                                     rendered="#{net.status == 'RESCUE_PENDING'}"
+                                                     icon="pi pi-check" />
+                                </p:column>
+                            </p:dataTable>
+                        </p:panel>
+                    </p:tab>
+                </p:tabView>
+            </h:form>
+        </div>
+    </ui:define>
+</ui:composition>
+</html>

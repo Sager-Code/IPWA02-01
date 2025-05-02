@@ -1,0 +1,157 @@
+/* Grundlegende Stile */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f0f8ff;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header */
+header {
+    background-color: #2c3e50;
+    color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.logo h1 {
+    margin-bottom: 5px;
+    color: #3498db;
+}
+
+nav {
+    margin-top: 15px;
+}
+
+/* Navigation */
+.ui-menubar {
+    background-color: #3498db !important;
+    border: none !important;
+}
+
+.ui-menuitem-text {
+    color: white !important;
+}
+
+/* Main Content */
+main {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+}
+
+/* Forms */
+.form-container {
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.required:after {
+    content: "*";
+    color: red;
+    margin-left: 3px;
+}
+
+/* Tables */
+.table-container {
+    overflow-x: auto;
+}
+
+.ui-datatable .ui-datatable-header {
+    background-color: #3498db !important;
+    color: white !important;
+    font-weight: bold;
+}
+
+.ui-datatable th {
+    background-color: #2c3e50 !important;
+    color: white !important;
+}
+
+/* Status Colors */
+.status-reported {
+    background-color: #f39c12 !important;
+    color: white !important;
+}
+
+.status-rescue-pending {
+    background-color: #3498db !important;
+    color: white !important;
+}
+
+.status-rescued {
+    background-color: #2ecc71 !important;
+    color: white !important;
+}
+
+.status-lost {
+    background-color: #e74c3c !important;
+    color: white !important;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 0.9em;
+    color: #7f8c8d;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    header, main {
+        padding: 15px;
+    }
+}
+
+/* PrimeFaces Custom Styling */
+.ui-panelgrid.form-grid .ui-grid-responsive .ui-grid-row {
+    border: none !important;
+}
+
+.ui-selectonemenu, .ui-inputtext {
+    width: 100% !important;
+}
+
+.ui-button {
+    margin-right: 10px !important;
+}
+
+.ui-datepicker {
+    z-index: 9999 !important;
+}

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/templates/template.xhtml">
+    <ui:define name="title">Shea Shepherd - Geisternetz melden</ui:define>
+    
+    <ui:define name="pageTitle">Geisternetz melden</ui:define>
+    
+    <ui:define name="content">
+        <div class="form-container">
+            <h:form id="reportForm">
+                <p:panel header="Ihre Informationen">
+                    <div class="form-group">
+                        <p:selectBooleanCheckbox id="anonymous" value="#{ghostNetController.anonymousReport}" 
+                                                 itemLabel="Anonym melden">
+                            <p:ajax update="reporterDetails" />
+                        </p:selectBooleanCheckbox>
+                    </div>
+                    
+                    <p:outputPanel id="reporterDetails">
+                        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-grid" 
+                                     rendered="#{!ghostNetController.anonymousReport}">
+                            <p:outputLabel for="reporterName" value="Name:" styleClass="required" />
+                            <p:inputText id="reporterName" value="#{ghostNetController.currentReporter.name}" 
+                                         required="true" requiredMessage="Bitte geben Sie Ihren Namen ein." />
+                            
+                            <p:outputLabel for="reporterPhone" value="Telefonnummer:" styleClass="required" />
+                            <p:inputText id="reporterPhone" value="#{ghostNetController.currentReporter.phoneNumber}" 
+                                         required="true" requiredMessage="Bitte geben Sie Ihre Telefonnummer für Rückfragen ein." />
+                        </p:panelGrid>
+                        
+                        <p:panelGrid columns="1" styleClass="ui-panelgrid-blank" 
+                                     rendered="#{ghostNetController.anonymousReport}">
+                            <p:outputLabel value="Sie melden anonym. Es werden keine persönlichen Daten gespeichert." 
+                                           styleClass="anonymous-info" />
+                        </p:panelGrid>
+                    </p:outputPanel>
+                </p:panel>
+                
+                <p:spacer height="20" />
+                
+                <p:panel header="Geisternetz-Details">
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-grid">
+                        <p:outputLabel for="latitude" value="Breitengrad (Latitude):" styleClass="required" />
+                        <p:inputNumber id="latitude" value="#{ghostNetController.currentGhostNet.latitude}" 
+                                     required="true" requiredMessage="Bitte geben Sie den Breitengrad ein."
+                                     decimalPlaces="6" />
+                        
+                        <p:outputLabel for="longitude" value="Längengrad (Longitude):" styleClass="required" />
+                        <p:inputNumber id="longitude" value="#{ghostNetController.currentGhostNet.longitude}" 
+                                     required="true" requiredMessage="Bitte geben Sie den Längengrad ein."
+                                     decimalPlaces="6" />
+                        
+                        <p:outputLabel for="size" value="Geschätzte Größe:" styleClass="required" />
+                        <p:inputText id="size" value="#{ghostNetController.currentGhostNet.estimatedSize}" 
+                                     required="true" requiredMessage="Bitte geben Sie die geschätzte Größe ein." 
+                                     placeholder="z.B. 20m²" />
+                    </p:panelGrid>
+                </p:panel>
+                
+                <p:spacer height="20" />
+                
+                <div class="button-container">
+                    <p:commandButton value="Geisternetz melden" 
+                                     action="#{ghostNetController.reportGhostNet}" 
+                                     styleClass="ui-button-success"
+                                     icon="pi pi-check" />
+                    
+                    <p:commandButton value="Zurücksetzen" 
+                                     type="reset" 
+                                     styleClass="ui-button-secondary"
+                                     icon="pi pi-times" />
+                </div>
+            </h:form>
+        </div>
+    </ui:define>
+</ui:composition>
+</html>

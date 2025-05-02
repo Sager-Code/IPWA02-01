@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/templates/template.xhtml">
+    <ui:define name="title">Shea Shepherd - Alle Geisternetze</ui:define>
+    
+    <ui:define name="pageTitle">Übersicht aller Geisternetze</ui:define>
+    
+    <ui:define name="content">
+        <div class="list-container">
+            <h:form id="listForm">
+                <p:panel header="Filter">
+                    <p:selectOneButton value="#{ghostNetController.filterStatus}" styleClass="status-filter">
+                        <f:selectItem itemLabel="Alle" itemValue="ALL" />
+                        <f:selectItem itemLabel="Gemeldet" itemValue="REPORTED" />
+                        <f:selectItem itemLabel="Bergung bevorstehend" itemValue="RESCUE_PENDING" />
+                        <f:selectItem itemLabel="Geborgen" itemValue="RESCUED" />
+                        <f:selectItem itemLabel="Verschollen" itemValue="LOST" />
+                        <p:ajax update="ghostNetsTable" listener="#{ghostNetController.filterGhostNets}" />
+                    </p:selectOneButton>
+                </p:panel>
+                
+                <p:spacer height="20" />
+                
+                <p:dataTable id="ghostNetsTable" value="#{ghostNetController.ghostNets}" var="net"
+                             emptyMessage="Keine Geisternetze gefunden."
+                             rowKey="#{net.id}" paginator="true" rows="10"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             currentPageReportTemplate="{startRecord}-{endRecord} von {totalRecords} Geisternetzen"
+                             rowsPerPageTemplate="5,10,20">
+                    
+                    <p:column headerText="ID" sortBy="#{net.id}">
+                        <h:outputText value="#{net.id}" />
+                    </p:column>
+                    
+                    <p:column headerText="Position">
+                        <h:outputText value="#{net.latitude}, #{net.longitude}" />
+                    </p:column>
+                    
+                    <p:column headerText="Geschätzte Größe">
+                        <h:outputText value="#{net.estimatedSize}" />
+                    </p:column>
+                    
+                    <p:column headerText="Status" sortBy="#{net.status}">
+                        <p:tag value="#{net.status.displayName}" styleClass="status-#{net.status}" />
+                    </p:column>
+                    
+                    <p:column headerText="Meldedatum" sortBy="#{net.reportDate}">
+                        <h:outputText value="#{net.reportDate}">
+                            <f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    
+                    <p:column headerText="Gemeldet von">
+                        <h:outputText value="Anonym" rendered="#{net.reporter.anonymous}" />
+                        <h:outputText value="#{net.reporter.name}" rendered="#{!net.reporter.anonymous}" />
+                    </p:column>
+                    
+                    <p:column headerText="Bergende Person">
+                        <h:outputText value="-" rendered="#{net.rescuer == null}" />
+                        <h:outputText value="#{net.rescuer.name}" rendered="#{net.rescuer != null}" />
+                    </p:column>
+                    
+                    <p:column headerText="Aktionen">
+                        <p:commandButton value="Details" 
+                                         onclick="PF('detailsDialog').show();"
+                                         update=":detailsForm"
+                                         styleClass="ui-button-info">
+                            <f:setPropertyActionListener value="#{net}" target="#{ghostNetController.currentGhostNet}" />
+                        </p:commandButton>
+                        
+                        <p:spacer width="5" />
+                        
+                        <!-- Rescuer zuweisen Button nur für gemeldete Netze anzeigen -->
+                        <p:commandButton value="Rescuer zuweisen"
+                                         onclick="PF('assignRescuerDialog').show();"
+                                         update=":assignRescuerForm"
+                                         styleClass="ui-button-primary"
+                                         rendered="#{net.status == 'REPORTED'}">
+                            <f:setPropertyActionListener value="#{net}" target="#{ghostNetController.currentGhostNet}" />
+                        </p:commandButton>
+                        
+                        <p:spacer width="5" rendered="#{net.status == 'REPORTED'}" />
+                        
+                        <!-- Als geborgen markieren nur für Netze mit Rescuer und Status "Bergung bevorstehend" -->
+                        <p:commandButton value="Als geborgen markieren"
+                                         action="#{ghostNetController.markAsRescued(net)}"
+                                         update="ghostNetsTable"
+                                         styleClass="ui-button-success"
+                                         rendered="#{net.status == 'RESCUE_PENDING'}">
+                        </p:commandButton>
+                        
+                        <p:spacer width="5" rendered="#{net.status == 'RESCUE_PENDING'}" />
+                        
+                        <!-- Als verschollen markieren für alle Netze außer "Geborgen" und "Verschollen" -->
+                        <p:commandButton value="Als verschollen markieren"
+                                         action="#{ghostNetController.markAsLost(net)}"
+                                         update="ghostNetsTable"
+                                         styleClass="ui-button-danger"
+                                         rendered="#{net.status != 'RESCUED' and net.status != 'LOST'}">
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+            
+            <!-- Details Dialog -->
+            <p:dialog header="Geisternetz Details" widgetVar="detailsDialog" modal="true" 
+                      showEffect="fade" hideEffect="fade" width="500">
+                <h:form id="detailsForm">
+                    <p:panelGrid columns="2" rendered="#{ghostNetController.currentGhostNet != null}">
+                        <h:outputText value="ID:" styleClass="detail-label" />
+                        <h:outputText value="#{ghostNetController.currentGhostNet.id}" />
+                        
+                        <h:outputText value="Breitengrad:" styleClass="detail-label" />
+                        <h:outputText value="#{ghostNetController.currentGhostNet.latitude}" />
+                        
+                        <h:outputText value="Längengrad:" styleClass="detail-label" />
+                        <h:outputText value="#{ghostNetController.currentGhostNet.longitude}" />
+                        
+                        <h:outputText value="Geschätzte Größe:" styleClass="detail-label" />
+                        <h:outputText value="#{ghostNetController.currentGhostNet.estimatedSize}" />
+                        
+                        <h:outputText value="Status:" styleClass="detail-label" />
+                        <p:tag value="#{ghostNetController.currentGhostNet.status.displayName}" 
+                               styleClass="status-#{ghostNetController.currentGhostNet.status}" />
+                        
+                        <h:outputText value="Meldedatum:" styleClass="detail-label" />
+                        <h:outputText value="#{ghostNetController.currentGhostNet.reportDate}">
+                            <f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
+                        </h:outputText>
+                        
+                        <h:outputText value="Letzte Aktualisierung:" styleClass="detail-label" />
+                        <h:outputText value="#{ghostNetController.currentGhostNet.lastUpdateDate}">
+                            <f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
+                        </h:outputText>
+                        
+                        <h:outputText value="Gemeldet von:" styleClass="detail-label" />
+                        <h:outputText value="#{ghostNetController.currentGhostNet.reporter.anonymous ? 'Anonym' : ghostNetController.currentGhostNet.reporter.name}" />
+                        
+                        <h:outputText value="Kontakt (Reporter):" styleClass="detail-label" 
+                                      rendered="#{!ghostNetController.currentGhostNet.reporter.anonymous}" />
+                        <h:outputText value="#{ghostNetController.currentGhostNet.reporter.phoneNumber}" 
+                                      rendered="#{!ghostNetController.currentGhostNet.reporter.anonymous}" />
+                        
+                        <h:outputText value="Bergende Person:" styleClass="detail-label" />
+                        <h:outputText value="#{ghostNetController.currentGhostNet.rescuer == null ? '-' : ghostNetController.currentGhostNet.rescuer.name}" />
+                        
+                        <h:outputText value="Kontakt (Rescuer):" styleClass="detail-label" 
+                                      rendered="#{ghostNetController.currentGhostNet.rescuer != null}" />
+                        <h:outputText value="#{ghostNetController.currentGhostNet.rescuer.phoneNumber}" 
+                                      rendered="#{ghostNetController.currentGhostNet.rescuer != null}" />
+                    </p:panelGrid>
+                    
+                    <div class="dialog-footer">
+                        <p:commandButton value="Schließen" onclick="PF('detailsDialog').hide();" 
+                                         styleClass="ui-button-secondary" />
+                    </div>
+                </h:form>
+            </p:dialog>
+            
+            <!-- Rescuer zuweisen Dialog -->
+            <p:dialog header="Rescuer zuweisen" widgetVar="assignRescuerDialog" modal="true" 
+                      showEffect="fade" hideEffect="fade" width="500">
+                <h:form id="assignRescuerForm">
+                    <p:panelGrid columns="2">
+                        <h:outputText value="Geisternetz ID:" />
+                        <h:outputText value="#{ghostNetController.currentGhostNet.id}" />
+                        
+                        <h:outputText value="Position:" />
+                        <h:outputText value="#{ghostNetController.currentGhostNet.latitude}, #{ghostNetController.currentGhostNet.longitude}" />
+                        
+                        <h:outputText value="Rescuer auswählen:" styleClass="required" />
+                        <p:selectOneMenu id="rescuerSelect" value="#{ghostNetController.selectedRescuerId}" 
+                                         required="true" requiredMessage="Bitte wählen Sie einen Rescuer aus.">
+                            <f:selectItem itemLabel="Bitte wählen" itemValue="" noSelectionOption="true" />
+                            <f:selectItems value="#{ghostNetController.rescuers}" var="r"
+                                           itemLabel="#{r.name} (#{r.phoneNumber})" itemValue="#{r.id}" />
+                        </p:selectOneMenu>
+                    </p:panelGrid>
+                    
+                    <div class="dialog-footer">
+                        <p:commandButton value="Zuweisen" 
+                                         action="#{ghostNetController.assignRescuer(ghostNetController.currentGhostNet)}" 
+                                         update=":listForm:ghostNetsTable"
+                                         oncomplete="if (!args.validationFailed) PF('assignRescuerDialog').hide();"
+                                         styleClass="ui-button-success" />
+                        
+                        <p:commandButton value="Abbrechen" onclick="PF('assignRescuerDialog').hide();" 
+                                         styleClass="ui-button-secondary" />
+                    </div>
+                </h:form>
+            </p:dialog>
+        </div>
+    </ui:define>
+</ui:composition>
+</html>

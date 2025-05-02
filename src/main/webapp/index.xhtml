@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/templates/template.xhtml">
+    <ui:define name="title">Shea Shepherd - Startseite</ui:define>
+    
+    <ui:define name="pageTitle">Willkommen beim Geisternetz-Bergungsprojekt</ui:define>
+    
+    <ui:define name="content">
+        <div class="welcome-container">
+            <p:panel header="Über das Projekt" styleClass="info-panel">
+                <p>
+                    Das Geisternetz-Bergungsprojekt von Shea Shepherd hat das Ziel, verloren gegangene Fischernetze 
+                    (sogenannte "Geisternetze") aus den Meeren zu bergen, um die marine Umwelt zu schützen.
+                </p>
+                <p>
+                    Geisternetze stellen eine ernsthafte Bedrohung für Meereslebewesen dar, da sie jahrelang 
+                    im Meer verbleiben und Fische, Meeressäuger und andere Tiere verletzen oder töten können.
+                </p>
+            </p:panel>
+            
+            <p:spacer height="20" />
+            
+            <p:panel header="So kannst du helfen" styleClass="action-panel">
+                <p:panelGrid columns="3" styleClass="ui-noborder">
+                    <p:column>
+                        <p:panel header="Geisternetz melden">
+                            <p>
+                                Hast du ein Geisternetz entdeckt? Melde es hier, 
+                                damit es geborgen werden kann!
+                            </p>
+                            <p:spacer height="10" />
+                            <p:commandButton value="Geisternetz melden" 
+                                             action="report"
+                                             styleClass="ui-button-success" />
+                        </p:panel>
+                    </p:column>
+                    
+                    <p:column>
+                        <p:panel header="Bergung übernehmen">
+                            <p>
+                                Bist du Teil eines Bergungsteams? Übernimm die 
+                                Bergung gemeldeter Geisternetze!
+                            </p>
+                            <p:spacer height="10" />
+                            <p:commandButton value="Bergung übernehmen" 
+                                             action="rescue"
+                                             styleClass="ui-button-primary" />
+                        </p:panel>
+                    </p:column>
+                    
+                    <p:column>
+                        <p:panel header="Alle Geisternetze anzeigen">
+                            <p>
+                                Verschaffe dir einen Überblick über alle gemeldeten 
+                                und geborgenen Geisternetze.
+                            </p>
+                            <p:spacer height="10" />
+                            <p:commandButton value="Alle anzeigen" 
+                                             action="list"
+                                             styleClass="ui-button-info" />
+                        </p:panel>
+                    </p:column>
+                </p:panelGrid>
+            </p:panel>
+            
+            <p:spacer height="20" />
+            
+            <p:panel header="Statistiken" styleClass="stats-panel">
+                <h:panelGrid columns="2">
+                    <ui:repeat value="#{ghostNetController.statisticsData.entrySet().toArray()}" var="entry">
+                        <div class="stat-item">
+                            <h:outputText value="#{entry.key}: " style="font-weight: bold;" />
+                            <h:outputText value="#{entry.value}" />
+                        </div>
+                    </ui:repeat>
+                </h:panelGrid>
+            </p:panel>
+        </div>
+    </ui:define>
+</ui:composition>
+</html>

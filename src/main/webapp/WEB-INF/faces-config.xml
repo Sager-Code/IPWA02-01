@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faces-config
+    xmlns="https://jakarta.ee/xml/ns/jakartaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-facesconfig_3_0.xsd"
+    version="3.0">
+    
+    <application>
+        <locale-config>
+            <default-locale>de</default-locale>
+            <supported-locale>de</supported-locale>
+            <supported-locale>en</supported-locale>
+        </locale-config>
+        
+        <resource-bundle>
+            <base-name>messages</base-name>
+            <var>msg</var>
+        </resource-bundle>
+    </application>
+    
+    <navigation-rule>
+        <from-view-id>/index.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>report</from-outcome>
+            <to-view-id>/report-ghostnet.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>rescue</from-outcome>
+            <to-view-id>/rescue-ghostnet.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>list</from-outcome>
+            <to-view-id>/list-ghostnets.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+    
+</faces-config>
